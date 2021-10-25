@@ -62,7 +62,7 @@ if __name__=="__main__":
     # pull frame
     frame = get_frame(URL)
 
-    # persistant storage if new frame
+    # persistent storage if new frame
     if frame:
         save_frame(frame, FRAME_PATH)
 
