@@ -7,5 +7,5 @@ Developed for Raspberry Pi with NeoPixel LED strip.
 3. Displays frame using NeoPixel
 
 Run each 5 minutes using crontab:
-`*/5 * * * *	/path/to/frame.py`
+`*/5 * * * *	/path/to/frame.py TOKEN`
 

@@ -1,3 +1,4 @@
+import sys
 import requests
 import logging
 import pathlib
@@ -7,6 +8,10 @@ import yaml
 import board
 import neopixel
 
+assert len(sys.argv) == 2, "Usage: python3 frame.py TOKEN"
+TOKEN = sys.argv[1]
+URL = "https://thesis.romanpeters.nl/frame"
+FRAME_PATH = "./last_frame"
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -18,10 +23,6 @@ with open('/home/pi/config.yml', 'r') as f:
     config = yaml.safe_load(f)
 
 pixels = neopixel.NeoPixel(board.D18, 50, brightness=config['brightness'], auto_write=False)
-
-TOKEN = pathlib.Path('/home/pi/.token').read_text().strip()
-URL = "https://thesis.romanpeters.nl/frame"
-FRAME_PATH = "./last_frame"
 
 
 def get_frame(url):
