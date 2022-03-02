@@ -10,15 +10,16 @@ import neopixel
 
 assert len(sys.argv) == 2, "Usage: python3 frame.py TOKEN"
 TOKEN = sys.argv[1]
-URL = "https://thesis.romanpeters.nl/frame"
+DEVICE_ID = pathlib.Path('/home/pi/device_id').read_text()
+URL = f"https://thesis.romanpeters.nl/api/{DEVICE_ID}"
 FRAME_PATH = "./last_frame"
+
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # TODO dynamic brightness configuration
-
 with open('/home/pi/config.yml', 'r') as f:
     config = yaml.safe_load(f)
 
@@ -40,8 +41,9 @@ def get_frame(url):
             if n == 7:  # fatal
                 return ""
 
-            logger.debug(f"Retrying in {pow(n+1, 2)} seconds")
-            time.sleep(pow(n+1, 2))  # 4... 9... 16... 25... 36...
+            retry_timer = pow(n+1, 2) # 4s, 9s, 16s, 25s, 36s, 49s
+            logger.debug(f"Retrying in {retry_timer} seconds")
+            time.sleep(retry_timer)
             response = requests.get(url, headers=headers)
     return ' '.join(j['frame'])
 
