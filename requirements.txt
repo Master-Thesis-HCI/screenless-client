@@ -1,0 +1,5 @@
+Flask==2.0.2
+PyYAML==6.0
+requests==2.21.0
+rpi-ws281x==4.3.0
+adafruit-circuitpython-neopixel==6.2.2
