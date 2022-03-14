@@ -1,0 +1,10 @@
+[Unit]
+Description=screenless-client
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi/screenless-client
+ExecStart=/usr/bin/python3 /home/pi/screenless-client/webserver.py
+
+[Install]
+WantedBy=multi-user.target
