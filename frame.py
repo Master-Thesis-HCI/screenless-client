@@ -1,5 +1,6 @@
 import sys
 import requests
+import json
 import logging
 import pathlib
 import json
@@ -8,12 +9,12 @@ import yaml
 import board
 import neopixel
 
-assert len(sys.argv) == 2, "Usage: python3 frame.py TOKEN"
-TOKEN = sys.argv[1]
+#assert len(sys.argv) == 2, "Usage: sudo python3 frame.py TOKEN"
+TOKEN = "1234" #sys.argv[1]
 DEVICE_ID = pathlib.Path('/home/pi/device_id').read_text()
 URL = f"https://thesis.romanpeters.nl/api/{DEVICE_ID}"
 FRAME_PATH = "./last_frame"
-
+pathlib.Path(FRAME_PATH).touch()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -30,9 +31,7 @@ def get_frame(url):
     headers = {"Authorization": TOKEN}
     response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
-        j = response.json()
-    else:
+    if response.status_code != 200:
         # couple of retries
         n = 0
         while not response.status_code == 200:
@@ -45,18 +44,19 @@ def get_frame(url):
             logger.debug(f"Retrying in {retry_timer} seconds")
             time.sleep(retry_timer)
             response = requests.get(url, headers=headers)
-    return ' '.join(j['frame'])
+    return  response.json()
 
 
 def save_frame(frame, path):
     with open(path, 'w+') as f:
-        f.write(frame)
+        f.write(json.dumps(frame))
 
 def set_led(path):
-    frame = pathlib.Path(path).read_text().split()
+    frame = json.loads(pathlib.Path(path).read_text())
     logger.debug(f'loaded frame={frame}')
-    for n, rgb in enumerate(frame):
-        pixels[n] = tuple(map(float, rgb.split(':')))
+    for n, rgb in frame["pixels"].items():
+        pixels[int(n)] = tuple(rgb)
+        logger.debug(f"setting pixel {n} to {rgb}")
     pixels.show()
 
 
