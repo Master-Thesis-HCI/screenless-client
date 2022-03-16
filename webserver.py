@@ -44,25 +44,30 @@ def get_device_id():
 @app.route('/')
 def api_home():
     linked = f"and linked to {get_device_id()}" if get_device_id() else ""
-    return f"AIS online {linked}"
+    help_text = """
+    <a href="/set">set</a>
+    <a href="/reset">reset</a>
+    <a href="/ban">ban</a>
+    """
+    return f"AIS online {linked}\n\n{help_text}"
 
 
-@app.route('/set')
+@app.route('/set/')
 def api_set():
     return set_device_id()
 
 
-@app.route('/set/<device_id>')
+@app.route('/set/<device_id>/')
 def api_set_id(device_id):
     return set_device_id(device_id)
 
 
-@app.route('/ban')
+@app.route('/ban/')
 def api_ban():
     return pathlib.Path(BLACKLIST).read_text()
 
 
-@app.route('/ban/<device_id>')
+@app.route('/ban/<device_id>/')
 def api_ban_id(device_id):
     if device_id in pathlib.Path(BLACKLIST).read_text().split("\n"):
         return "Already banned"
@@ -72,7 +77,7 @@ def api_ban_id(device_id):
     return f"Banned {device_id}"
 
 
-@app.route('/unban/<device_id>')
+@app.route('/unban/<device_id>/')
 def api_unban_id(device_id):
     blacklist = pathlib.Path(BLACKLIST).read_text().split("\n")
     if device_id not in blacklist:
@@ -85,6 +90,6 @@ def api_unban_id(device_id):
 
 
 if __name__=="__main__":
-
+    app.url_map.strict_slashes = False
     app.run(host='0.0.0.0', port=1234, debug=False)
 
