@@ -54,8 +54,8 @@ def save_frame(frame, path):
 def set_led(path):
     frame = json.loads(pathlib.Path(path).read_text())
     logger.debug(f'loaded frame={frame}')
-    for n, rgb in frame["pixels"].items():
-        pixels[int(n)] = tuple(rgb)
+    for window in frame["windows"].values():
+        pixels[window["index"]] = tuple(window["pixel"])
         logger.debug(f"setting pixel {n} to {rgb}")
     pixels.show()
 
