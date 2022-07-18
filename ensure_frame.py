@@ -8,4 +8,4 @@ if __name__== "__main__":
             set_led(FRAME_PATH)
         except Exception as e:
             print(e)
-        time.sleep(10)
+        time.sleep(1)
