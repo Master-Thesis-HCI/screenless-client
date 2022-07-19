@@ -6,6 +6,7 @@ import logging
 import pathlib
 import json
 import time
+import datetime
 import yaml
 import board
 import neopixel
@@ -78,12 +79,16 @@ def save_frame(frame, path):
     with open(path, 'w+') as f:
         f.write(json.dumps(frame))
 
-def set_led(path):
+def set_led(path, verbose=True):
     frame = json.loads(pathlib.Path(path).read_text())
-    logger.debug(f'loaded frame={frame}')
+    if verbose:
+        logger.debug(f'loaded frame={frame}')
+    else:
+        logger.debug(f"setting pixels from frame")
     for window in frame["windows"].values():
         pixels[window["index"]] = tuple(window["pixel"])
-        logger.debug(f"setting pixel {window['index']} to {window['pixel']}")
+        if verbose:
+            logger.debug(f"setting pixel {window['index']} to {window['pixel']}")
     pixels.show()
 
 
@@ -98,6 +103,12 @@ if __name__=="__main__":
 
     # update AIS
     set_led(FRAME_PATH)
+
+    # continue updating AIS for a minute
+    current_minute = datetime.datetime.now().minute
+    while datetime.datetime.now().minute == current_minute:
+        set_led(FRAME_PATH, verbose=False)
+        time.sleep(2)
 
     print("done!")
 

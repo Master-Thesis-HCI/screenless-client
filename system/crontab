@@ -21,5 +21,6 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
-@reboot /usr/bin/python3 /home/pi/screenless-client/boot_animation.py
-@reboot /usr/bin/rm /home/pi/device_id 
+@reboot              /usr/bin/python3 /home/pi/screenless-client/boot_animation.py
+@reboot              /usr/bin/rm /home/pi/device_id
+  * *  *   *   *     /usr/bin/python3 /home/pi/screenless-client/frame.py
