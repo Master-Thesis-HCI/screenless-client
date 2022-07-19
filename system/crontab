@@ -22,3 +22,4 @@
 #
 # m h  dom mon dow   command
 @reboot /usr/bin/python3 /home/pi/screenless-client/boot_animation.py
+@reboot /usr/bin/rm /home/pi/device_id 

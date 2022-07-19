@@ -1,4 +1,5 @@
 import sys
+import os
 import requests
 import json
 import logging
@@ -9,16 +10,42 @@ import yaml
 import board
 import neopixel
 
-#assert len(sys.argv) == 2, "Usage: sudo python3 frame.py TOKEN"
-TOKEN = "1234" #sys.argv[1]
-DEVICE_ID = pathlib.Path('/home/pi/device_id').read_text()
-URL = f"https://thesis.romanpeters.nl/api/{DEVICE_ID}"
-FRAME_PATH = "./last_frame"
-pathlib.Path(FRAME_PATH).touch()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
+# pairing
+DEVICE_ID_PATH = "/home/pi/device_id"
+TOKEN = "1234" #sys.argv[1]
+
+
+
+def set_device_id():
+    url = "https://thesis.romanpeters.nl/api/latest"
+    headers = {"Authorization": TOKEN}
+    response = requests.get(url, headers=headers)
+    print("*"*88)
+    if response.status_code == 200 and response.json().get("device_id"):
+        with open(DEVICE_ID_PATH, "w+") as f:
+            f.write(response.json()["device_id"])
+            logger.debug("Set new device id")
+    else:
+        logger.warning(f"{url} unreachable {response.status_code}")
+
+
+if not os.path.exists(DEVICE_ID_PATH):
+    set_device_id()
+
+
+
+#assert len(sys.argv) == 2, "Usage: sudo python3 frame.py TOKEN"
+DEVICE_ID = pathlib.Path('/home/pi/device_id').read_text().strip()
+URL = f"https://thesis.romanpeters.nl/api/{DEVICE_ID}/"
+FRAME_PATH = "./last_frame"
+pathlib.Path(FRAME_PATH).touch()
+
 
 # TODO dynamic brightness configuration
 with open('/home/pi/config.yml', 'r') as f:
@@ -35,7 +62,7 @@ def get_frame(url):
         # couple of retries
         n = 0
         while not response.status_code == 200:
-            logger.warning(f"Website status code={response.status_code}")
+            logger.warning(f"Website status code={response.status_code} {url}")
             n += 1
             if n == 7:  # fatal
                 return ""
@@ -56,7 +83,7 @@ def set_led(path):
     logger.debug(f'loaded frame={frame}')
     for window in frame["windows"].values():
         pixels[window["index"]] = tuple(window["pixel"])
-        logger.debug(f"setting pixel {n} to {rgb}")
+        logger.debug(f"setting pixel {window['index']} to {window['pixel']}")
     pixels.show()
 
 
